@@ -17,7 +17,7 @@ From 9th to 11th grade, I spent copious amounts of time with FRC Team 624 Crypto
 
 ## Why are you in this class?
 
-Although having taken 429 and 439, I do not feel as if I am competent with C as something like Java or R. Since my interest lies in trading and finance, I want to be as confident in C/C++ as I am in Java.
+Although having taken 429 and 439, I do not feel as if I am competent with C as something like Java or R. Since my interest lies in trading and finance, I want to be as confident in C/C++ as I am in Java, at least in a interview setting.
 
 ## How did you like the first couple of lectures?
 
@@ -30,3 +30,7 @@ I have no issues with cold-calling. In fact, I find that my engagement with the 
 ## What made you happy this week?
 
 This semester, I am taking PED 106c-7 Weightlifting and starting to play pickup Ultimate Frisbee on Thursdays. I also met up with some friends I have not seen since November on Friday! 
+
+## What's your pick-of-the-week
+
+I enjoyed rereading my Applied Stats notes for my upcoming Mathematical Statistics class. There are a lot of little things to remember with regards to Confidence Intervals.
