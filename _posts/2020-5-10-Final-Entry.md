@@ -15,7 +15,9 @@ I wanted to take a course using C++ because I wanted to be able to HackerRanks i
 
 ## What's the most significant thing you learned?
 
-++i vs i++, just kidding, most likely developing an intuition to writing solutions to algorithms problems in C++ just as well as I could in Java. We also learned a lot of copy constructors and copy assignment.
+++i vs i++, just kidding, most likely developing an intuition to writing solutions to algorithms problems in C++ just as well as I could in Java. 
+
+In terms of topics I will most remember, it would const,lambdas,copy constructors, operators, and friends.
 
 ## How many hours a week did you spend coding/debugging/testing for this class?
 
