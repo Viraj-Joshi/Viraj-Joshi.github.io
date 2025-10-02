@@ -11,6 +11,8 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-sitemap
+future: true
+permalink: /blog/:year/:month/:day/:title/
 
 # Exclude from processing
 exclude:
@@ -26,12 +28,6 @@ exclude:
 # Include
 include:
   - _pages
-
-# Collections
-collections:
-  posts:
-    output: true
-    permalink: /blog/:year/:month/:day/:title/
 
 # Author
 author: "Viraj Joshi"
