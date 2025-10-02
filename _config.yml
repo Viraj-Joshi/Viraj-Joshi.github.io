@@ -23,10 +23,6 @@ exclude:
   - gemfiles/
   - README.md
 
-# Include
-include:
-  - _pages
-
 # Collections
 collections:
   posts:
