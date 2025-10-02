@@ -1,0 +1,38 @@
+# Site settings
+title: "Viraj Joshi"
+description: "Personal website of Viraj Joshi"
+url: "https://viraj-joshi.github.io"
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - .bundle/
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - README.md
+
+# Include
+include:
+  - _pages
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year/:month/:day/:title/
+
+# Author
+author: "Viraj Joshi"
+email: "viraj_joshi@utexas.edu"
