@@ -6,6 +6,6 @@ title: Blog
 {% for post in site.posts %}
 <div class="post-preview">
   <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
-  <p>{{ post.excerpt }}</p>
+  <p>{{ post.excerpt | truncatewords: 30 }}</p>
 </div>
 {% endfor %}

@@ -8,9 +8,6 @@ baseurl: ""
 markdown: kramdown
 highlighter: rouge
 theme: minima
-plugins:
-  - jekyll-feed
-  - jekyll-sitemap
 future: true
 permalink: /blog/:year/:month/:day/:title/
 
@@ -26,8 +23,6 @@ exclude:
   - README.md
 
 # Include
-include:
-  - _pages
 
 # Author
 author: "Viraj Joshi"
