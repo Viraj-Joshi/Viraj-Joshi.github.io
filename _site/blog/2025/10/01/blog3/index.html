@@ -24,6 +24,38 @@
     <link rel="stylesheet" type="text/css" href="/stylesheet.css">
     <link rel="icon" href="/images/favicon.ico">
 
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+    // Dropdown functionality
+    function toggleDropdown(contentId) {
+      console.log('Toggling dropdown:', contentId);
+      var content = document.getElementById(contentId);
+      var button = event.target;
+
+      console.log('Content element:', content);
+      console.log('Button element:', button);
+
+      if (content) {
+        button.classList.toggle('expanded');
+        content.classList.toggle('show');
+        console.log('Toggled successfully');
+      } else {
+        console.error('Could not find dropdown content with ID:', contentId);
+      }
+    }
+    </script>
+
   </head>
 
   <body>
