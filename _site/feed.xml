@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-10-03T00:29:46-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Viraj Joshi</title><subtitle>Personal website of Viraj Joshi</subtitle><author><name>Viraj Joshi</name></author><entry><title type="html">diffusion models from denoising probabilistic models</title><link href="http://localhost:4000/blog/2025/10/01/blog3/" rel="alternate" type="text/html" title="diffusion models from denoising probabilistic models" /><published>2025-10-01T00:00:00-05:00</published><updated>2025-10-01T00:00:00-05:00</updated><id>http://localhost:4000/blog/2025/10/01/blog3</id><content type="html" xml:base="http://localhost:4000/blog/2025/10/01/blog3/"><![CDATA[<p>TODO</p>]]></content><author><name>Viraj Joshi</name></author><summary type="html"><![CDATA[TODO]]></summary></entry><entry><title type="html">What is a score function?</title><link href="http://localhost:4000/blog/2025/10/01/blog1/" rel="alternate" type="text/html" title="What is a score function?" /><published>2025-10-01T00:00:00-05:00</published><updated>2025-10-01T00:00:00-05:00</updated><id>http://localhost:4000/blog/2025/10/01/blog1</id><content type="html" xml:base="http://localhost:4000/blog/2025/10/01/blog1/"><![CDATA[<p>This post will serve two functions: to explain what a score function is, and to demonstrate the basics of JAX.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-10-08T04:28:27-05:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Viraj Joshi</title><subtitle>Personal website of Viraj Joshi</subtitle><author><name>Viraj Joshi</name></author><entry><title type="html">diffusion models from denoising probabilistic models</title><link href="http://localhost:4000/blog/2025/10/01/blog3/" rel="alternate" type="text/html" title="diffusion models from denoising probabilistic models" /><published>2025-10-01T00:00:00-05:00</published><updated>2025-10-01T00:00:00-05:00</updated><id>http://localhost:4000/blog/2025/10/01/blog3</id><content type="html" xml:base="http://localhost:4000/blog/2025/10/01/blog3/"><![CDATA[<p>TODO</p>]]></content><author><name>Viraj Joshi</name></author><summary type="html"><![CDATA[TODO]]></summary></entry><entry><title type="html">What is a score function?</title><link href="http://localhost:4000/blog/2025/10/01/blog1/" rel="alternate" type="text/html" title="What is a score function?" /><published>2025-10-01T00:00:00-05:00</published><updated>2025-10-01T00:00:00-05:00</updated><id>http://localhost:4000/blog/2025/10/01/blog1</id><content type="html" xml:base="http://localhost:4000/blog/2025/10/01/blog1/"><![CDATA[<p>This post will serve two functions: to explain what a score function is, and to demonstrate the basics of JAX.</p>
 
 <p>A score function is the gradient of the log probability density function with respect to the input.</p>
 
@@ -58,7 +58,11 @@ dataset = create_dataset(mus,sigmas,ws)
 
 <p>We have a created a simple 1D equal mixture of Gaussians.</p>
 
-<p>The important part to note is that JAX uses pure functions, which means</p>
+<div style="text-align: center;">
+<img src="/images/post1/dataset.png" alt="Mixture of Gaussians" />
+</div>
+
+<p>The interesting part of this is to note is that JAX uses pure functions, which means</p>
 
 <ol>
   <li>For the same input, the function will always return the same output</li>
@@ -66,9 +70,9 @@ dataset = create_dataset(mus,sigmas,ws)
 </ol>
 
 <p>In this case, this poses a problem for random generation, since if we call random.normal with the same key for each Gaussian, we will get the same samples every time.
-Instead, we have to explicitly get ‘mu’ different keys by ‘jax.random.split’ because that is how many Gaussians we have.</p>
+Instead, we have to explicitly get ‘mu’ different keys by ‘jax.random.split’ because that is how many Gaussians we have in our mixture.</p>
 
-<p><button class="dropdown-btn" onclick="toggleDropdown('code1')"></button> <span class="dropdown-label">code</span></p>
+<p><button class="dropdown-btn" onclick="toggleDropdown('code1')"></button> <span class="dropdown-label">plotting code</span></p>
 <div id="code1" class="dropdown-content">
 <div class="code-highlight">
 <pre>
@@ -117,12 +121,17 @@ def forward(params, x):
   final_w, final_b = params[-1]
   out = jnp.dot(out,final_w) + final_b
   return out
-</code>
+</code> 
 </pre>
 </div>
 
-<h2 id="one-way-to-calculate-gradients-from-a-mini-batch">One way to calculate gradients from a mini-batch</h2>
+<p>Similarly to creating a random key for each Gaussian, we have to create a random key with "random.split" for each layer of the MLP, so each layer is not randomized to the same values.</p>
 
+<h2 id="loss-function-and-gradient-calculation">Loss Function and Gradient Calculation</h2>
+
+<p>There are two ways to calculate gradients from a mini-batch. We can calculate the gradient for each example in the batch, and then average the gradients. Alternatively, we can average the loss over the batch, and then take the gradient of that average loss. Both give the same gradients as the gradient of the average loss is the same as the average of the gradients. However, the former is more efficient, since it only requires one backward pass through the network, instead of one backward pass per example in the batch.</p>
+
+<h3 id="per-datapoint-gradients-the-inefficient-way">Per-datapoint gradients (the inefficient way)</h3>
 <div class="code-highlight">
 <pre>
 <code>
@@ -153,7 +162,15 @@ def make_step(params, opt_state, batch):
 </pre>
 </div>
 
-<h3 id="the-better-way">The better way</h3>
+<p><code class="language-plaintext highlighter-rouge">vmap</code> will vectorize the provided function over the specified axis. Since I just learned about <code class="language-plaintext highlighter-rouge">vmap</code>, my first thought was to create a loss function that would work for one example, and then vectorize over the batch. In this case, we want to vectorize over the batch axis (the 0th axis) of the input data, while keeping the model parameters the same for each datapoint in the batch (hence <code class="language-plaintext highlighter-rouge">in_axes=(None, 0)</code>).</p>
+
+<p>But, we also want the gradient, not just the loss. The <code class="language-plaintext highlighter-rouge">value_and_grad</code> function computes both the value of the loss function and its gradient with respect to the model parameters. <code class="language-plaintext highlighter-rouge">argnums</code> indicates what input variable(s) of a function will be differentiated wrt. In our case, we explictly indicates that we want to differentiate with respect to the model parameters with <code class="language-plaintext highlighter-rouge">argnums=0</code>. If you pass in a tuple, then you will get a tuple of gradients. By using <code class="language-plaintext highlighter-rouge">vmap</code>, we apply this function to each example in the batch, resulting in a list of losses and gradients.</p>
+
+<p>However, this is inefficient, since it requires one backward pass per example in the batch. Interestingly, this also exposed me to another JAX concept, Pytrees, when trying to compute the average gradient. Pytrees are nested structures of python containers (like lists, tuples, and dictionaries), called branches, that can hold data (like arrays or scalars) at the leaves. In our case, the model parameters $[(w1,b1), (w2,b2), \dots]$ are a list of tuples, so the outer list is a branch, and each tuple is a nested branch, with the weights and biases as leaves.</p>
+
+<p>Pytrees give us the flexibility to do handy operations like <code class="language-plaintext highlighter-rouge">vmap,grad,etc</code> on complex data structures, like <code class="language-plaintext highlighter-rouge">params</code>. However, this means we cannot just call <code class="language-plaintext highlighter-rouge">jnp.mean(grads)</code> because the gradients will also be a nested list of tuples, an undefined operation. More specifically, the data at the leaves of the gradients will have an extra batch dimension, since we calculated the gradient for each example in the batch. We extract the mean over this batch dimension for each leaf in the nested structure by using <code class="language-plaintext highlighter-rouge">jax.tree_util.tree_map</code>, which walks though the entire PyTree, applying a function we specificy to each leaf. This is exactly <code class="language-plaintext highlighter-rouge">lambda g: jnp.mean(g, axis=0)</code>.</p>
+
+<h3 id="per-batch-gradient-the-efficient-way">Per-batch gradient (the efficient way)</h3>
 
 <div class="code-highlight">
 <pre>
@@ -183,6 +200,10 @@ def make_step(params, opt_state, batch):
 </pre>
 </div>
 
+<p>Now, that we’ve seen the inefficient approach, we can see that the efficient approach is much simpler. We just need to create a <code class="language-plaintext highlighter-rouge">batch_loss</code> function that averages the loss over the batch by using <code class="language-plaintext highlighter-rouge">vmap</code> to vectorize the <code class="language-plaintext highlighter-rouge">score_matching_loss</code> function over the batch axis of the input data (again using <code class="language-plaintext highlighter-rouge">in_axes=(None, 0)</code>). Then, we can use <code class="language-plaintext highlighter-rouge">value_and_grad</code> on this <code class="language-plaintext highlighter-rouge">batch_loss</code> function to get the loss and gradient in one backward pass.</p>
+
+<p>It is worth noting <code class="language-plaintext highlighter-rouge">grad</code> is still a PyTree, but since we only calculated one gradient for the entire batch, there is no extra batch dimension to average over. This means its PyTree structure $[\text{(grad_w1,grad_b1),(grad_w2,grad_b2)}]$ is the same as <code class="language-plaintext highlighter-rouge">params</code>, so we can directly use it in <code class="language-plaintext highlighter-rouge">optax.apply_updates</code>, which requires the gradient to have the same structure as the parameters.</p>
+
 <h2 id="training-loop">Training loop</h2>
 <div class="code-highlight">
 <pre>
@@ -210,6 +231,12 @@ for epoch in range(epochs):
   print(f'Epoch: {epoch}, Loss: {loss}')
 </code>
 </pre>
+</div>
+
+<p>The only interesting part of the training loop is how we create the mini-batches. Again, since JAX uses pure functions, we have to explicitly split the random key at each step to get a new key for generating random indices for the mini-batch.</p>
+
+<div style="text-align: center;">
+<img src="/images/post1/loss.png" alt="Training Loss" />
 </div>
 
 <p><button class="dropdown-btn" onclick="toggleDropdown('code2')"></button> <span class="dropdown-label">plotting code</span></p>
@@ -255,6 +282,12 @@ true_score = vmap(jax.jacfwd(mixture_norm_log_pdf,argnums=0), in_axes=(0, None, 
 </pre>
 </div>
 
+<p>We know the true density function of our mixture of Gaussians, so we can calculate the true score function by taking the gradient of the log density function. First, we calculate the log PDF of the mixture of Gaussians, and then we use <code class="language-plaintext highlighter-rouge">jax.jacfwd</code> to take the gradient of this scalar function. Since we want to calculate the score function for multiple values of x, we use <code class="language-plaintext highlighter-rouge">vmap</code> to vectorize this gradient function over the input x values.</p>
+
+<div style="text-align: center;">
+<img src="/images/post1/true_vs_expected_score.png" alt="True vs Expected Score" />
+</div>
+
 <p><button class="dropdown-btn" onclick="toggleDropdown('code3')"></button> <span class="dropdown-label">plotting code</span></p>
 <div id="code3" class="dropdown-content">
 <div class="code-highlight">
@@ -270,9 +303,11 @@ plt.show()
 </div>
 </div>
 
+<p>Great news! Our learned score function matches the true score function pretty well on this 1d toy dataset. We will see how this falls apart in our next blog post with high dimensional data.</p>
+
 <h2 id="how-do-we-generate-samples">How do we generate samples?</h2>
 
-<p>The scores tell us the direction of increasing likelihood, but that will result in deterministic sampling. As a result, we follow the ‘noisy’ scores. This is called Langevin dynamics. When run for long enough with small enough steps, x_t ~ p(x).</p>
+<p>The scores tell us the direction of increasing likelihood, but that following this from some initial $x_0$ will result in deterministic sampling. As a result, we follow the ‘noisy’ scores. This is called Langevin dynamics. When run for long enough with small enough steps, $x_t \sim p(x)$.</p>
 
 \[x_{t+1} = x_t + \alpha_t \nabla_x \log p(x_t) + \sqrt{2\alpha} z_t, \quad z_t \sim \mathcal N(0, I)\]
 
@@ -289,9 +324,7 @@ n_samples = 1000
 
 def f(prev,key):
   epsilon = random.normal(key,shape=prev.shape)
-  # Use in_axes=(None, 0) to indicate that params is not mapped (None)
-  # and prev is mapped along its first axis (0)
-  return prev + alpha*forward(params,prev) + np.sqrt(2 * alpha)*epsilon, prev
+  return prev + alpha*forward(params,prev)[0][0] + np.sqrt(2 * alpha)*epsilon, prev
 
 def g(x,key):
   keys = random.split(key,n_samples)
@@ -301,11 +334,25 @@ def g(x,key):
   return res, history
 
 
-xs = random.uniform(key,shape=(n_particles,1,1))
+xs = random.uniform(key,shape=(n_particles,))
 keys = random.split(key,n_particles)
 res, history = vmap(g)(xs,keys)
 </code>
 </pre>
+</div>
+
+<p>lax.scan is a handy function that allows us to carry state through a loop. In our case, we want to carry the current position of the particles through the Langevin dynamics steps. The <code class="language-plaintext highlighter-rouge">f</code> function is one step of Langevin dynamics. The <code class="language-plaintext highlighter-rouge">g</code> function runs <code class="language-plaintext highlighter-rouge">n_samples</code> steps of Langevin dynamics for one particle, using <code class="language-plaintext highlighter-rouge">lax.scan</code> to carry the state through the steps.  <code class="language-plaintext highlighter-rouge">lax.scan()</code> takes three arguments: the function to apply at each step, the initial state <code class="language-plaintext highlighter-rouge">init</code>, and the sequence of inputs <code class="language-plaintext highlighter-rouge">xs</code> (data each timestep we want to reference) as we iterate. We can write f(carry,x)-&gt;(carry,y), where carry is the state we want to carry through the loop, x is the input at the current step, and y is the output at the current step.</p>
+
+<p>In our case, <code class="language-plaintext highlighter-rouge">lax.scan()</code> will call <code class="language-plaintext highlighter-rouge">f</code>, <code class="language-plaintext highlighter-rouge">n_samples</code> times, passing the output of one step of Langevin dynamics as the input to the next call (the carry). The <code class="language-plaintext highlighter-rouge">xs</code> argument is an array of keys, one for each step, so that we can get a new random epsilon at each step. The <code class="language-plaintext highlighter-rouge">init</code> argument is the initial position of the particle. It returns the final position of the particle and the history of positions.</p>
+
+<p>Since we want to run this for multiple particles, we use <code class="language-plaintext highlighter-rouge">vmap</code> to vectorize the <code class="language-plaintext highlighter-rouge">g</code> function over different initial positions.</p>
+
+<p>The only wrinkle is that we need a new random key for each step of Langevin dynamics to get distinct epsilon for a particle over time and that this epsilon is distinct across particles as well. The latter is fulfilled by creating <code class="language-plaintext highlighter-rouge">n_particles</code> keys, feeding this into <code class="language-plaintext highlighter-rouge">g</code>, which creates <code class="language-plaintext highlighter-rouge">n_samples</code> child keys (number of Langevin steps) in <code class="language-plaintext highlighter-rouge">f</code> for each particle, fulfilling the former requirement.</p>
+
+<p>That is why <code class="language-plaintext highlighter-rouge">vmap(g)</code> is called over the particles and keys.</p>
+
+<div style="text-align: center;">
+<img src="/images/post1/samples.png" alt="samples from learned score function" />
 </div>
 
 <p><button class="dropdown-btn" onclick="toggleDropdown('code4')"></button> <span class="dropdown-label">plotting code</span></p>
